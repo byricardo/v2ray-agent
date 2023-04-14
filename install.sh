@@ -74,7 +74,7 @@ checkSystem() {
 #Check CPU provider
 checkCPUVendor() {
 	if [[ -n $(which uname) ]]; then
-		if [[ "$(uname)" =="Linux" ]]; then 		case "$(uname -m)" in
+		if [[ "$(uname)" == "Linux" ]]; then 		case "$(uname -m)" in
 			'amd64' | 'x86_64')
 				xrayCoreCPUVendor="Xray-linux-64"
 				v2rayCoreCPUVendor="v2ray-linux-64"
@@ -246,7 +246,7 @@ readAcmeTLS() {
 readCustomPort() {
 	if [[ -n "${configPath}" ]]; then 	local port=
 		port=$(jq -r .inbounds[0].port "${configPath}${frontingType}.json")
-		if [[ "${port}" !="443" ]]; then 		customPort=${port}
+		if [[ "${port}" != "443" ]]; then 		customPort=${port}
 		fi
 	fi
 }
@@ -328,7 +328,7 @@ checkBTPanel() {
 #Read the order of the current Alpn
 readInstallAlpn() {
 	if [[ -n ${currentInstallProtocolType} ]]; then 	local alpn
-		if [[ "${coreInstallType}" =="1" ]]; then
+		if [[ "${coreInstallType}" == "1" ]]; then
 			alpn=$(jq -r .inbounds[0].streamSettings.xtlsSettings.alpn[0] ${configPath}${frontingType}.json)
 		else
 			alpn=$(jq -r .inbounds[0].streamSettings.tlsSettings.alpn[0] ${configPath}${frontingType}.json)
@@ -440,7 +440,7 @@ readConfigHostPathUUID() {
 
 		if [[ -z "${currentPath}" ]]; then
 			dest=$(jq -r -c '.inbounds[0].settings.fallbacks[]|select(.alpn)|.dest' ${configPath}${frontingType}.json | head -1)
-			if [[ "${dest}" =="31302" || "${dest}" =="31304" ]]; then
+			if [[ "${dest}" == "31302" || "${dest}" == "31304" ]]; then
 
 				if grep -q "trojangrpc {" <${nginxConfigPath}alone.conf; then 				currentPath=$(grep "trojangrpc {" <${nginxConfigPath}alone.conf | awk -F "[/]" '{print $2}' | awk -F "[t][r][o][j][a][n]" '{print $1}')
 				elif grep -q "grpc {" <${nginxConfigPath}alone.conf; then 				currentPath=$(grep "grpc {" <${nginxConfigPath}alone.conf | head -1 | awk -F "[/]" '{print $2}' | awk -F "[g][r][p][c]" '{print $1}')
@@ -457,23 +457,23 @@ readConfigHostPathUUID() {
 		fi
 
 	fi
-	if [[ "${coreInstallType}" =="1" || "${coreInstallType}" =="3" ]]; then
-		if [[ "${coreInstallType}" =="3" ]]; then
+	if [[ "${coreInstallType}" == "1" || "${coreInstallType}" == "3" ]]; then
+		if [[ "${coreInstallType}" == "3" ]]; then
 			currentHost=$(jq -r .inbounds[0].streamSettings.tlsSettings.certificates[0].certificateFile ${configPath}${frontingType}.json | awk -F '[t][l][s][/]' '{print $2}' | awk -F '[.][c][r][t]' '{print $1}')
 		else
 			currentHost=$(jq -r .inbounds[0].streamSettings.xtlsSettings.certificates[0].certificateFile ${configPath}${frontingType}.json | awk -F '[t][l][s][/]' '{print $2}' | awk -F '[.][c][r][t]' '{print $1}')
 		fi
 		currentUUID=$(jq -r .inbounds[0].settings.clients[0].id ${configPath}${frontingType}.json)
 		currentAdd=$(jq -r .inbounds[0].settings.clients[0].add ${configPath}${frontingType}.json)
-		if [[ "${currentAdd}" =="null" ]]; then
+		if [[ "${currentAdd}" == "null" ]]; then
 			currentAdd=${currentHost}
 		fi
 		currentPort=$(jq .inbounds[0].port ${configPath}${frontingType}.json)
 
-	elif [[ "${coreInstallType}" =="2" ]]; then
+	elif [[ "${coreInstallType}" == "2" ]]; then
 		currentHost=$(jq -r .inbounds[0].streamSettings.tlsSettings.certificates[0].certificateFile ${configPath}${frontingType}.json | awk -F '[t][l][s][/]' '{print $2}' | awk -F '[.][c][r][t]' '{print $1}')
 		currentAdd=$(jq -r .inbounds[0].settings.clients[0].add ${configPath}${frontingType}.json)
-		if [[ "${currentAdd}" =="null" ]]; then
+		if [[ "${currentAdd}" == "null" ]]; then
 			currentAdd=${currentHost}
 		fi
 		currentUUID=$(jq -r .inbounds[0].settings.clients[0].id ${configPath}${frontingType}.json)
@@ -542,19 +542,19 @@ showInstallStatus() {
 
 #Clean up old residues
 cleanUp() {
-	if [[ "$1" =="v2rayClean" ]]; then
+	if [[ "$1" == "v2rayClean" ]]; then
 		rm -rf "$(find /etc/v2ray-agent/v2ray/* | grep -E '(config_full.json|conf)')"
 		handleV2Ray stop >/dev/null
 		rm -f /etc/systemd/system/v2ray.service
-	elif [[ "$1" =="xrayClean" ]]; then
+	elif [[ "$1" == "xrayClean" ]]; then
 		rm -rf "$(find /etc/v2ray-agent/xray/* | grep -E '(config_full.json|conf)')"
 		handleXray stop >/dev/null
 		rm -f /etc/systemd/system/xray.service
 
-	elif [[ "$1" =="v2rayDel" ]]; then
+	elif [[ "$1" == "v2rayDel" ]]; then
 		rm -rf /etc/v2ray-agent/v2ray/*
 
-	elif [[ "$1" =="xrayDel" ]]; then
+	elif [[ "$1" == "xrayDel" ]]; then
 		rm -rf /etc/v2ray-agent/xray/*
 	fi
 }
@@ -589,7 +589,7 @@ mkdirTools() {
 installTools() {
 	EchoContent skyBlue " n Progress $1/${totalProgress}: Installation tool"
 	#Fix individual system issues with ubuntu
-	if [[ "${release}" =="ubuntu" ]]; then
+	if [[ "${release}" == "ubuntu" ]]; then
 		dpkg --configure -a
 	fi
 
@@ -604,7 +604,7 @@ installTools() {
 		${updateReleaseInfoChange} >/dev/null 2>&1
 	fi
 
-	if [[ "${release}" =="centos" ]]; then
+	if [[ "${release}" == "centos" ]]; then
 		rm -rf /var/run/yum.pid
 		${installType} epel-release >/dev/null 2>&1
 	fi
@@ -638,7 +638,7 @@ installTools() {
 
 	if ! find /usr/bin /usr/sbin | grep -q -w cron; then
 		EchoContent green "-->Install crontabs"
-		if [[ "${release}" =="ubuntu" ]] || [[ "${release}" =="debian" ]]; then
+		if [[ "${release}" == "ubuntu" ]] || [[ "${release}" == "debian" ]]; then
 			${installType} cron >/dev/null 2>&1
 		else
 			${installType} crontabs >/dev/null 2>&1
@@ -698,7 +698,7 @@ installTools() {
 		nginxVersion=$(echo "${nginxVersion}" | awk -F "[n][g][i][n][x][/]" '{print $2}' | awk -F "[.]" '{print $2}')
 		if [[ ${nginxVersion} -lt 14 ]]; then
 			Read - r - p "Read that the current Nginx version does not support gRPC, which will cause installation failure. Do you want to uninstall Nginx and reinstall it? [y/n]:" uninstallNginxStatus
-			if [[ "${unInstallNginxStatus}" =="y" ]]; then
+			if [[ "${unInstallNginxStatus}" == "y" ]]; then
 				${removeType} nginx >/dev/null 2>&1
 				EchoContent yellow "-->nginx uninstallation completed"
 				EchoContent green "-->Install nginx"
@@ -712,8 +712,8 @@ installTools() {
 		EchoContent green "-->Install semanage"
 		${installType} bash-completion >/dev/null 2>&1
 
-		if [[ "${centosVersion}" =="7" ]]; then 		policyCoreUtils="policycoreutils-python.x86_64"
-		elif [[ "${centosVersion}" =="8" ]]; then 		policyCoreUtils="policycoreutils-python-utils-2.9-9.el8.noarch"
+		if [[ "${centosVersion}" == "7" ]]; then 		policyCoreUtils="policycoreutils-python.x86_64"
+		elif [[ "${centosVersion}" == "8" ]]; then 		policyCoreUtils="policycoreutils-python-utils-2.9-9.el8.noarch"
 		fi
 
 		if [[ -n "${policyCoreUtils}" ]]; then
@@ -745,7 +745,7 @@ installTools() {
 #Install Nginx
 installNginxTools() {
 
-	if [[ "${release}" =="debian" ]]; then
+	if [[ "${release}" == "debian" ]]; then
 		sudo apt install gnupg2 ca-certificates lsb-release -y >/dev/null 2>&1
 		echo "deb http://nginx.org/packages/mainline/debian  $(lsb_release -cs) nginx" | sudo tee /etc/apt/sources.list.d/nginx.list >/dev/null 2>&1
 		echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | sudo tee /etc/apt/preferences.d/99nginx >/dev/null 2>&1
@@ -754,7 +754,7 @@ installNginxTools() {
 		sudo mv /tmp/nginx_signing.key /etc/apt/trusted.gpg.d/nginx_signing.asc
 		sudo apt update >/dev/null 2>&1
 
-	elif [[ "${release}" =="ubuntu" ]]; then
+	elif [[ "${release}" == "ubuntu" ]]; then
 		sudo apt install gnupg2 ca-certificates lsb-release -y >/dev/null 2>&1
 		echo "deb http://nginx.org/packages/mainline/ubuntu  $(lsb_release -cs) nginx" | sudo tee /etc/apt/sources.list.d/nginx.list >/dev/null 2>&1
 		echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | sudo tee /etc/apt/preferences.d/99nginx >/dev/null 2>&1
@@ -763,7 +763,7 @@ installNginxTools() {
 		sudo mv /tmp/nginx_signing.key /etc/apt/trusted.gpg.d/nginx_signing.asc
 		sudo apt update >/dev/null 2>&1
 
-	elif [[ "${release}" =="centos" ]]; then
+	elif [[ "${release}" == "centos" ]]; then
 		${installType} yum-utils >/dev/null 2>&1
 		cat <<EOF >/etc/yum.repos.d/nginx.repo
 [nginx-stable]
@@ -792,17 +792,17 @@ EOF
 #Install Warp
 installWarp() {
 	${installType} gnupg2 -y >/dev/null 2>&1
-	if [[ "${release}" =="debian" ]]; then
+	if [[ "${release}" == "debian" ]]; then
 		curl -s https://pkg.cloudflareclient.com/pubkey.gpg  | sudo apt-key add - >/dev/null 2>&1
 		echo "deb http://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list >/dev/null 2>&1
 		sudo apt update >/dev/null 2>&1
 
-	elif [[ "${release}" =="ubuntu" ]]; then
+	elif [[ "${release}" == "ubuntu" ]]; then
 		curl -s https://pkg.cloudflareclient.com/pubkey.gpg  | sudo apt-key add - >/dev/null 2>&1
 		echo "deb http://pkg.cloudflareclient.com/ focal main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list >/dev/null 2>&1
 		sudo apt update >/dev/null 2>&1
 
-	elif [[ "${release}" =="centos" ]]; then
+	elif [[ "${release}" == "centos" ]]; then
 		${installType} yum-utils >/dev/null 2>&1
 		sudo rpm -ivh " http://pkg.cloudflareclient.com/cloudflare-release-el ${centosVersion}.rpm" >/dev/null 2>&1
 	fi
@@ -834,7 +834,7 @@ initTLSNginxConfig() {
 	Echo "Read the last installation record, domain name at last installation: ${currentHost}"
 		echo
 		Read - r - p "Please check for correctness. Do you want to use the domain name from the last installation? [y/n]:" historyDomainStatus
-		if [[ "${historyDomainStatus}" =="y" ]]; then 		domain=${currentHost}
+		if [[ "${historyDomainStatus}" == "y" ]]; then 		domain=${currentHost}
 			EchoContent yellow " n -->Domain name: ${domain}"
 		else
 			echo
@@ -889,7 +889,7 @@ EOF
 #Modify nginx redirection configuration
 updateRedirectNginxConf() {
 
-	#	if [[ ${BTPanelStatus} =="true" ]]; then
+	#	if [[ ${BTPanelStatus} == "true" ]]; then
 	#
 	#		cat <<EOF >${nginxConfigPath}alone.conf
 	#        server {
@@ -1078,7 +1078,7 @@ checkIP() {
 		EchoContent red "-->Please check if the firewall rules are open ${portFirewallPortStatus}  n
 		Read - r - p "Do you want to modify firewall rules through scripts to open the ${portFirewallPortStatus} port? [y/n]:" allPortFirewallStatus
 
-		if [[ ${allPortFirewallStatus} =="y" ]]; then
+		if [[ ${allPortFirewallStatus} == "y" ]]; then
 			if [[ -n "${customPort}" ]]; then
 				allowPort "${customPort}"
 			else
@@ -1106,7 +1106,7 @@ checkIP() {
 customSSLEmail() {
 	if echo "$1" | grep -q "validate email"; then
 		Read - r - p "Do you want to re-enter the email address [y/n]:" sslEmailStatus
-		if [[ "${sslEmailStatus}" =="y" ]]; then
+		if [[ "${sslEmailStatus}" == "y" ]]; then
 			sed '/ACCOUNT_EMAIL/d' /root/.acme.sh/account.conf >/root/.acme.sh/account.conf_tmp && mv /root/.acme.sh/account.conf_tmp /root/.acme.sh/account.conf
 		else
 			exit 0
@@ -1130,11 +1130,11 @@ customSSLEmail() {
 #Select SSL installation type
 switchSSLType() {
 	if [[ -z "${sslType}" ]]; then
-		echoContent red "\n=============================================================="
+		echoContent red "\n============================================================== "
 		EchoContent yellow "1. letsencrypt [default]"
 		echoContent yellow "2.zerossl"
 		EchoContent yellow "3. buypass [does not support DNS requests]
-		echoContent red "=============================================================="
+		echoContent red "============================================================== "
 		Read - r - p "Please select [Enter] to use default:" selectSSLType
 		case ${selectSSLType} in
 		1)
@@ -1164,7 +1164,7 @@ selectAcmeInstallSSL() {
 	fi
 	echo
 	if [[ -n "${customPort}" ]]; then
-		if [[ "${selectSSLType}" =="3" ]]; then
+		if [[ "${selectSSLType}" == "3" ]]; then
 			EchoContent red "-->Buypass does not support free wildcard certificates"
 			echo
 			exit
@@ -1182,7 +1182,7 @@ selectAcmeInstallSSL() {
 
 #Install SSL certificate
 acmeInstallSSL() {
-	if [[ "${dnsSSLStatus}" =="true" ]]; then
+	if [[ "${dnsSSLStatus}" == "true" ]]; then
 
 		sudo "$HOME/.acme.sh/acme.sh" --issue -d "*.${dnsTLSDomain}" -d "${dnsTLSDomain}" --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please -k ec-256 --server "${sslType}" ${installSSLIPv6} 2>&1 | tee -a /etc/v2ray-agent/tls/acme.log >/dev/null
 
@@ -1197,7 +1197,7 @@ acmeInstallSSL() {
 			EchoContent yellow "-->Please wait for 1-2 minutes after adding is completed
 			echo
 			Read - r - p "Add completed [y/n]:" addDNSTXTRecordStatus
-			if [[ "${addDNSTXTRecordStatus}" =="y" ]]; then 			local txtAnswer=
+			if [[ "${addDNSTXTRecordStatus}" == "y" ]]; then 			local txtAnswer=
 				txtAnswer=$(dig +nocmd "_acme-challenge.${dnsTLSDomain}" txt +noall +answer | awk -F "[\"]" '{print $2}')
 				if echo "${txtAnswer}" | grep -q "${txtValue}"; then
 					EchoContent green "-->TXT record verification passed"
@@ -1224,14 +1224,14 @@ customPortFunction() {
 	if [[ -n "${customPort}" || -n "${currentPort}" ]]; then
 		echo
 		Read - r - p "Read the port from the previous installation, do you want to use the port from the previous installation? [y/n]:" historyCustomimPortStatus
-		if [[ "${historyCustomPortStatus}" =="y" ]]; then 		showPort="${currentPort}"
+		if [[ "${historyCustomPortStatus}" == "y" ]]; then 		showPort="${currentPort}"
 			if [[ -n "${customPort}" ]]; then 			showPort="${customPort}"
 			fi
 			EchoContent yellow " n -->Port: ${showPort}"
 		fi
 	fi
 
-	if [[ "${historyCustomPortStatus}" =="n" ]]; then
+	if [[ "${historyCustomPortStatus}" == "n" ]]; then
 		echo
 		EchoContent yellow "Please enter the port [default: 443]. For custom ports, only DNS is allowed to apply for certificates [enter to use default]"
 		Read - r - p "Port:" customPort
@@ -1274,7 +1274,7 @@ installTLS() {
 		else
 			EchoContent yellow "-->If the certificate has not expired or is customized, please select [n]  n
 			Read - r - p "Do you want to reinstall? [y/n]:" reInstallStatus
-			if [[ "${reInstallStatus}" =="y" ]]; then
+			if [[ "${reInstallStatus}" == "y" ]]; then
 				rm -rf /etc/v2ray-agent/tls/*
 				installTLS "$1"
 			fi
@@ -1283,14 +1283,14 @@ installTLS() {
 	elif [[ -d "$HOME/.acme.sh" ]] && [[ ! -f "$HOME/.acme.sh/${tlsDomain}_ecc/${tlsDomain}.cer" || ! -f "$HOME/.acme.sh/${tlsDomain}_ecc/${tlsDomain}.key" ]]; then
 		EchoContent green "-->Install TLS certificate"
 
-		if [[ "${installDNSACMEStatus}" !="true" ]]; then
+		if [[ "${installDNSACMEStatus}" != "true" ]]; then
 			switchSSLType
 			customSSLEmail
 			selectAcmeInstallSSL
 		else
 			EchoContent green "-->Detected that a wildcard certificate has been installed, automatically generating"
 		fi
-		if [[ "${installDNSACMEStatus}" =="true" ]]; then
+		if [[ "${installDNSACMEStatus}" == "true" ]]; then
 			echo
 			if [[ -d "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc" && -f "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc/*.${dnsTLSDomain}.key" && -f "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc/*.${dnsTLSDomain}.cer" ]]; then
 				sudo "$HOME/.acme.sh/acme.sh" --installcert -d "*.${dnsTLSDomain}" --fullchainpath "/etc/v2ray-agent/tls/${tlsDomain}.crt" --keypath "/etc/v2ray-agent/tls/${tlsDomain}.key" --ecc >/dev/null
@@ -1302,7 +1302,7 @@ installTLS() {
 
 		if [[ ! -f "/etc/v2ray-agent/tls/${tlsDomain}.crt" || ! -f "/etc/v2ray-agent/tls/${tlsDomain}.key" ]] || [[ -z $(cat "/etc/v2ray-agent/tls/${tlsDomain}.key") || -z $(cat "/etc/v2ray-agent/tls/${tlsDomain}.crt") ]]; then
 			tail -n 10 /etc/v2ray-agent/tls/acme.log
-			if [[ ${installTLSCount} =="1" ]]; then
+			if [[ ${installTLSCount} == "1" ]]; then
 				EchoContent red "-->TLS installation failed, please check acme logs"
 				exit 0
 			fi
@@ -1357,7 +1357,7 @@ randomPathFunction() {
 		echo
 	fi
 
-	if [[ "${historyPathStatus}" =="y" ]]; then 	customPath=${currentPath}
+	if [[ "${historyPathStatus}" == "y" ]]; then 	customPath=${currentPath}
 		EchoContent green "-->Successfully used  n
 	else
 		EchoContent yellow "Please enter a custom path [example: alone], no slashes required, [carriage return] random path"
@@ -1380,7 +1380,7 @@ nginxBlog() {
 	if [[ -d "/usr/share/nginx/html" && -f "/usr/share/nginx/html/check" ]]; then
 		echo
 		Read - r - p "Detected installation of masquerade site, do you need to reinstall [y/n]:" nginxBlogInstallStatus
-		if [[ "${nginxBlogInstallStatus}" =="y" ]]; then
+		if [[ "${nginxBlogInstallStatus}" == "y" ]]; then
 			rm -rf /usr/share/nginx/html
 			randomNum=$((RANDOM % 9 + 1))
 			wget -q -P /usr/share/nginx https://raw.githubusercontent.com/reeceyng/v2ray-agent/master/fodder/blog/unable/html ${randomNum}.zip >/dev/null
@@ -1425,7 +1425,7 @@ updateSELinuxHTTPPortT() {
 #Operation Nginx
 handleNginx() {
 
-	if [[ -z $(pgrep -f "nginx") ]] && [[ "$1" =="start" ]]; then
+	if [[ -z $(pgrep -f "nginx") ]] && [[ "$1" == "start" ]]; then
 		systemctl start nginx 2>/etc/v2ray-agent/nginx_error.log
 
 		sleep 0.5
@@ -1443,7 +1443,7 @@ handleNginx() {
 			EchoContent green "-->Nginx started successfully"
 		fi
 
-	elif [[ -n $(pgrep -f "nginx") ]] && [[ "$1" =="stop" ]]; then
+	elif [[ -n $(pgrep -f "nginx") ]] && [[ "$1" == "stop" ]]; then
 		systemctl stop nginx
 		sleep 0.5
 		if [[ -n $(pgrep -f "nginx") ]]; then
@@ -1480,10 +1480,10 @@ renewalTLS() {
 		if grep -q "buypass" <"/etc/v2ray-agent/tls/ssl_type"; then 		sslRenewalDays=180
 		fi
 	fi
-	if [[ -d "$HOME/.acme.sh/${domain}_ecc" && -f "$HOME/.acme.sh/${domain}_ecc/${domain}.key" && -f "$HOME/.acme.sh/${domain}_ecc/${domain}.cer" ]] || [[ "${installDNSACMEStatus}" =="true" ]]; then
+	if [[ -d "$HOME/.acme.sh/${domain}_ecc" && -f "$HOME/.acme.sh/${domain}_ecc/${domain}.key" && -f "$HOME/.acme.sh/${domain}_ecc/${domain}.cer" ]] || [[ "${installDNSACMEStatus}" == "true" ]]; then
 		modifyTime=
 
-		if [[ "${installDNSACMEStatus}" =="true" ]]; then
+		if [[ "${installDNSACMEStatus}" == "true" ]]; then
 			modifyTime=$(stat "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc/*.${dnsTLSDomain}.cer" | sed -n '7,6p' | awk '{print $2" "$3" "$4" "$5}')
 		else
 			modifyTime=$(stat "$HOME/.acme.sh/${domain}_ecc/${domain}.cer" | sed -n '7,6p' | awk '{print $2" "$3" "$4" "$5}')
@@ -1548,8 +1548,8 @@ installV2Ray() {
 	readInstallType
 	EchoContent skyBlue " n Progress $1/${totalProgress}: Install V2Ray"
 
-	if [[ "${coreInstallType}" !="2" && "${coreInstallType}" !="3" ]]; then
-		if [[ "${selectCoreType}" =="2" ]]; then
+	if [[ "${coreInstallType}" != "2" && "${coreInstallType}" != "3" ]]; then
+		if [[ "${selectCoreType}" == "2" ]]; then
 
 			version=$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases  | jq -r '. []|select (.prerelease==false)|.tag_name' | grep -v 'v5' | head -1)
 		else
@@ -1566,7 +1566,7 @@ installV2Ray() {
 		unzip -o "/etc/v2ray-agent/v2ray/${v2rayCoreCPUVendor}.zip" -d /etc/v2ray-agent/v2ray >/dev/null
 		rm -rf "/etc/v2ray-agent/v2ray/${v2rayCoreCPUVendor}.zip"
 	else
-		if [[ "${selectCoreType}" =="3" ]]; then
+		if [[ "${selectCoreType}" == "3" ]]; then
 			EchoContent green "-->Lock v2ray core version to v4.32.1"
 			rm -f /etc/v2ray-agent/v2ray/v2ray
 			rm -f /etc/v2ray-agent/v2ray/v2ctl
@@ -1574,7 +1574,7 @@ installV2Ray() {
 		else
 			EchoContent green "-->v2ray core version: $(/etc/v2ray agent/v2ray/v2ray -- version | awk '{print $2}' | head -1)
 			Read - r - p "Do you want to update or upgrade? [y/n]:" reInstallV2RayStatus
-			if [[ "${reInstallV2RayStatus}" =="y" ]]; then
+			if [[ "${reInstallV2RayStatus}" == "y" ]]; then
 				rm -f /etc/v2ray-agent/v2ray/v2ray
 				rm -f /etc/v2ray-agent/v2ray/v2ctl
 				installV2Ray "$1"
@@ -1603,7 +1603,7 @@ installHysteria() {
 	else
 		EchoContent green "-->Hysteria version: $(/etc/v2ray agent/Hysteria/hydrogen -- version | awk '{print $3}')
 		Read - r - p "Do you want to update or upgrade? [y/n]:" reInstallHysteriaStatus
-		if [[ "${reInstallHysteriaStatus}" =="y" ]]; then
+		if [[ "${reInstallHysteriaStatus}" == "y" ]]; then
 			rm -f /etc/v2ray-agent/hysteria/hysteria
 			installHysteria "$1"
 		fi
@@ -1615,7 +1615,7 @@ installXray() {
 	readInstallType
 	EchoContent skyBlue " n Progress $1/${totalProgress}: Installing Xray"
 
-	if [[ "${coreInstallType}" !="1" ]]; then
+	if [[ "${coreInstallType}" != "1" ]]; then
 
 		version=$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases  | jq -r ".[]|select (.prerelease==${prereleaseStatus})|.tag_name" | head -1)
 
@@ -1632,7 +1632,7 @@ installXray() {
 	else
 		EchoContent green "-->Xray core version: $(/etc/v2ray agent/xray/xray -- version | awk '{print $2}' | head -1)
 		Read - r - p "Do you want to update or upgrade? [y/n]:" reInstallXrayStatus
-		if [[ "${reInstallXrayStatus}" =="y" ]]; then
+		if [[ "${reInstallXrayStatus}" == "y" ]]; then
 			rm -f /etc/v2ray-agent/xray/xray
 			installXray "$1"
 		fi
@@ -1647,17 +1647,17 @@ v2rayVersionManageMenu() {
 		menu
 		exit 0
 	fi
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "1. Upgrade v2ray core"
 	EchoContent yellow "2. Fallback v2ray core"
 	EchoContent yellow "3. Close v2ray core"
 	EchoContent yellow "4. Open v2ray core"
 	EchoContent yellow "5. Restart v2ray core"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" selectV2RayType
-	if [[ "${selectV2RayType}" =="1" ]]; then
+	if [[ "${selectV2RayType}" == "1" ]]; then
 		updateV2Ray
-	elif [[ "${selectV2RayType}" =="2" ]]; then
+	elif [[ "${selectV2RayType}" == "2" ]]; then
 		EchoContent yellow " n1. Only the last five versions can be rolled back"
 		EchoContent yellow "2. There is no guarantee that it can be used normally after rollback"
 		EchoContent yellow "3. If the fallback version does not support the current config, it will not be able to connect. Be cautious
@@ -1673,11 +1673,11 @@ v2rayVersionManageMenu() {
 			EchoContent red " n -->Input error, please re-enter"
 			v2rayVersionManageMenu 1
 		fi
-	elif [[ "${selectV2RayType}" =="3" ]]; then
+	elif [[ "${selectV2RayType}" == "3" ]]; then
 		handleV2Ray stop
-	elif [[ "${selectV2RayType}" =="4" ]]; then
+	elif [[ "${selectV2RayType}" == "4" ]]; then
 		handleV2Ray start
-	elif [[ "${selectV2RayType}" =="5" ]]; then
+	elif [[ "${selectV2RayType}" == "5" ]]; then
 		reloadCore
 	fi
 }
@@ -1690,23 +1690,23 @@ xrayVersionManageMenu() {
 		menu
 		exit 0
 	fi
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "1. Upgrade Xray core"
 	EchoContent yellow "2. Upgrade Xray core preview version"
 	EchoContent yellow "3. Fallback Xray core"
 	EchoContent yellow "4. Close Xray core"
 	EchoContent yellow "5. Open Xray core"
 	EchoContent yellow "6. Restart Xray core"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" selectXrayType
-	if [[ "${selectXrayType}" =="1" ]]; then
+	if [[ "${selectXrayType}" == "1" ]]; then
 		updateXray
-	elif [[ "${selectXrayType}" =="2" ]]; then
+	elif [[ "${selectXrayType}" == "2" ]]; then
 
 		prereleaseStatus=true
 		updateXray
 
-	elif [[ "${selectXrayType}" =="3" ]]; then
+	elif [[ "${selectXrayType}" == "3" ]]; then
 		EchoContent yellow " n1. Only the last five versions can be rolled back"
 		EchoContent yellow "2. There is no guarantee that it can be used normally after rollback"
 		EchoContent yellow "3. If the fallback version does not support the current config, it will not be able to connect. Be cautious
@@ -1721,11 +1721,11 @@ xrayVersionManageMenu() {
 			EchoContent red " n -->Input error, please re-enter"
 			xrayVersionManageMenu 1
 		fi
-	elif [[ "${selectXrayType}" =="4" ]]; then
+	elif [[ "${selectXrayType}" == "4" ]]; then
 		handleXray stop
-	elif [[ "${selectXrayType}" =="5" ]]; then
+	elif [[ "${selectXrayType}" == "5" ]]; then
 		handleXray start
-	elif [[ "${selectXrayType}" =="6" ]]; then
+	elif [[ "${selectXrayType}" == "6" ]]; then
 		reloadCore
 	fi
 
@@ -1766,10 +1766,10 @@ updateV2Ray() {
 		fi
 		if [[ -n "$1" ]]; then
 			Read - r - p "Fallback version is ${version}, do you want to continue? [y/n]:" rollbackV2RayStatus
-			if [[ "${rollbackV2RayStatus}" =="y" ]]; then
-				if [[ "${coreInstallType}" =="2" ]]; then
+			if [[ "${rollbackV2RayStatus}" == "y" ]]; then
+				if [[ "${coreInstallType}" == "2" ]]; then
 					EchoContent green "-->Current v2ray core version: $(/etc/v2ray agent/v2ray/v2ray -- version | awk '{print $2}' | head -1)
-				elif [[ "${coreInstallType}" =="1" || "${coreInstallType}" =="3" ]]; then
+				elif [[ "${coreInstallType}" == "1" || "${coreInstallType}" == "3" ]]; then
 					EchoContent green "-->Current Xray core version: $(/etc/v2ray agent/xray/xray -- version | awk '{print $2}' | head -1)
 				fi
 
@@ -1780,9 +1780,9 @@ updateV2Ray() {
 			else
 				EchoContent green "-->Abandon fallback version"
 			fi
-		elif [[ "${version}" =="v$(/etc/v2ray-agent/v2ray/v2ray --version | awk '{print $2}' | head -1)" ]]; then
+		elif [[ "${version}" == "v$(/etc/v2ray-agent/v2ray/v2ray --version | awk '{print $2}' | head -1)" ]]; then
 			Read - r - p "The current version is the same as the latest version. Do you want to reinstall it? [y/n]:" reInstallV2RayStatus
-			if [[ "${reInstallV2RayStatus}" =="y" ]]; then
+			if [[ "${reInstallV2RayStatus}" == "y" ]]; then
 				handleV2Ray stop
 				rm -f /etc/v2ray-agent/v2ray/v2ray
 				rm -f /etc/v2ray-agent/v2ray/v2ctl
@@ -1792,7 +1792,7 @@ updateV2Ray() {
 			fi
 		else
 			The latest version is: ${version}. Do you want to update it? [y/n]: "installV2RayStatus
-			if [[ "${installV2RayStatus}" =="y" ]]; then
+			if [[ "${installV2RayStatus}" == "y" ]]; then
 				rm -f /etc/v2ray-agent/v2ray/v2ray
 				rm -f /etc/v2ray-agent/v2ray/v2ctl
 				updateV2Ray
@@ -1836,7 +1836,7 @@ updateXray() {
 
 		if [[ -n "$1" ]]; then
 			Read - r - p "Fallback version is ${version}, do you want to continue? [y/n]:" rollbackXrayStatus
-			if [[ "${rollbackXrayStatus}" =="y" ]]; then
+			if [[ "${rollbackXrayStatus}" == "y" ]]; then
 				EchoContent green "-->Current Xray core version: $(/etc/v2ray agent/xray/xray -- version | awk '{print $2}' | head -1)
 
 				handleXray stop
@@ -1845,9 +1845,9 @@ updateXray() {
 			else
 				EchoContent green "-->Abandon fallback version"
 			fi
-		elif [[ "${version}" =="v$(/etc/v2ray-agent/xray/xray --version | awk '{print $2}' | head -1)" ]]; then
+		elif [[ "${version}" == "v$(/etc/v2ray-agent/xray/xray --version | awk '{print $2}' | head -1)" ]]; then
 			Read - r - p "The current version is the same as the latest version. Do you want to reinstall it? [y/n]:" reInstallXrayStatus
-			if [[ "${reInstallXrayStatus}" =="y" ]]; then
+			if [[ "${reInstallXrayStatus}" == "y" ]]; then
 				handleXray stop
 				rm -f /etc/v2ray-agent/xray/xray
 				rm -f /etc/v2ray-agent/xray/xray
@@ -1857,7 +1857,7 @@ updateXray() {
 			fi
 		else
 			The latest version is: ${version}. Do you want to update it? [y/n]: "installXrayStatus
-			if [[ "${installXrayStatus}" =="y" ]]; then
+			if [[ "${installXrayStatus}" == "y" ]]; then
 				rm -f /etc/v2ray-agent/xray/xray
 				updateXray
 			else
@@ -1872,9 +1872,9 @@ updateXray() {
 checkGFWStatue() {
 	readInstallType
 	EchoContent skyBlue " n Progress $1/${totalProgress}: Verify service startup status"
-	if [[ "${coreInstallType}" =="1" || "${coreInstallType}" =="3" ]] && [[ -n $(pgrep -f xray/xray) ]]; then
+	if [[ "${coreInstallType}" == "1" || "${coreInstallType}" == "3" ]] && [[ -n $(pgrep -f xray/xray) ]]; then
 		EchoContent green "-->Service started successfully"
-	elif [[ "${coreInstallType}" =="2" ]] && [[ -n $(pgrep -f v2ray/v2ray) ]]; then
+	elif [[ "${coreInstallType}" == "2" ]] && [[ -n $(pgrep -f v2ray/v2ray) ]]; then
 		EchoContent green "-->Service started successfully"
 	else
 		EchoContent red "-->Service startup failed, please check if the terminal has log printing"
@@ -1988,15 +1988,15 @@ EOF
 handleV2Ray() {
 	# shellcheck disable=SC2010
 	if find /bin /usr/bin | grep -q systemctl && ls /etc/systemd/system/| grep -q v2ray.service; then
-		if [[ -z $(pgrep -f "v2ray/v2ray") ]] && [[ "$1" =="start" ]]; then
+		if [[ -z $(pgrep -f "v2ray/v2ray") ]] && [[ "$1" == "start" ]]; then
 			systemctl start v2ray.service
-		elif [[ -n $(pgrep -f "v2ray/v2ray") ]] && [[ "$1" =="stop" ]]; then
+		elif [[ -n $(pgrep -f "v2ray/v2ray") ]] && [[ "$1" == "stop" ]]; then
 			systemctl stop v2ray.service
 		fi
 	fi
 	sleep 0.8
 
-	if [[ "$1" =="start" ]]; then
+	if [[ "$1" == "start" ]]; then
 		if [[ -n $(pgrep -f "v2ray/v2ray") ]]; then
 			EchoContent green "-->V2Ray started successfully"
 		else
@@ -2004,7 +2004,7 @@ handleV2Ray() {
 			EchoContent red "Please manually execute [/etc/v2ray agent/v2ray/v2ray confdir/etc/v2ray agent/v2ray/conf] to view the error log"
 			exit 0
 		fi
-	elif [[ "$1" =="stop" ]]; then
+	elif [[ "$1" == "stop" ]]; then
 		if [[ -z $(pgrep -f "v2ray/v2ray") ]]; then
 			EchoContent green "-->V2Ray closed successfully"
 		else
@@ -2019,20 +2019,20 @@ handleV2Ray() {
 handleHysteria() {
 	# shellcheck disable=SC2010
 	if find /bin /usr/bin | grep -q systemctl && ls /etc/systemd/system/| grep -q hysteria.service; then
-		if [[ -z $(pgrep -f "hysteria/hysteria") ]] && [[ "$1" =="start" ]]; then 		systemctl start hysteria.service
-		elif [[ -n $(pgrep -f "hysteria/hysteria") ]] && [[ "$1" =="stop" ]]; then 		systemctl stop hysteria.service
+		if [[ -z $(pgrep -f "hysteria/hysteria") ]] && [[ "$1" == "start" ]]; then 		systemctl start hysteria.service
+		elif [[ -n $(pgrep -f "hysteria/hysteria") ]] && [[ "$1" == "stop" ]]; then 		systemctl stop hysteria.service
 		fi
 	fi
 	sleep 0.8
 
-	if [[ "$1" =="start" ]]; then
+	if [[ "$1" == "start" ]]; then
 		if [[ -n $(pgrep -f "hysteria/hysteria") ]]; Then	 		echoContent green "-->Hysteria started successfully"
 		else
 			EchoContent red "Hysteria startup failed"
 			EchoContent red "Please manually execute [/etc/v2ray agent/system/hybrid -- log level debug - c/etc/v2ray agent/system/conf/config.json server] to view the error log
 			exit 0
 		fi
-	elif [[ "$1" =="stop" ]]; then
+	elif [[ "$1" == "stop" ]]; then
 		if [[ -z $(pgrep -f "hysteria/hysteria") ]]; Then	 		echoContent green "-->Hysteria closed successfully"
 		else
 			EchoContent red "Hysteria shutdown failed"
@@ -2044,16 +2044,16 @@ handleHysteria() {
 #Operation xray
 handleXray() {
 	if [[ -n $(find /bin /usr/bin -name "systemctl") ]] && [[ -n $(find /etc/systemd/system/-name "xray.service") ]]; then
-		if [[ -z $(pgrep -f "xray/xray") ]] && [[ "$1" =="start" ]]; then
+		if [[ -z $(pgrep -f "xray/xray") ]] && [[ "$1" == "start" ]]; then
 			systemctl start xray.service
-		elif [[ -n $(pgrep -f "xray/xray") ]] && [[ "$1" =="stop" ]]; then
+		elif [[ -n $(pgrep -f "xray/xray") ]] && [[ "$1" == "stop" ]]; then
 			systemctl stop xray.service
 		fi
 	fi
 
 	sleep 0.8
 
-	if [[ "$1" =="start" ]]; then
+	if [[ "$1" == "start" ]]; then
 		if [[ -n $(pgrep -f "xray/xray") ]]; then
 			EchoContent green "-->Xray started successfully"
 		else
@@ -2061,7 +2061,7 @@ handleXray() {
 			EchoContent red "Please manually execute [/etc/v2ray agent/xray/xray confdir/etc/v2ray agent/xray/conf] to view the error log"
 			exit 0
 		fi
-	elif [[ "$1" =="stop" ]]; then
+	elif [[ "$1" == "stop" ]]; then
 		if [[ -z $(pgrep -f "xray/xray") ]]; then
 			EchoContent green "-->X-ray closed successfully"
 		else
@@ -2077,7 +2077,7 @@ getClients() {
 
 	local addClientsStatus=$2
 	previousClients=
-	if [[ ${addClientsStatus} =="true" ]]; then
+	if [[ ${addClientsStatus} == "true" ]]; then
 		if [[ ! -f "${path}" ]]; then
 			echo
 			local protocol
@@ -2094,7 +2094,7 @@ getClients() {
 addClients() {
 	local path=$1
 	local addClientsStatus=$2
-	if [[ ${addClientsStatus} =="true" && -n "${previousClients}" ]]; then 	config=$(jq -r ".inbounds[0].settings.clients =${previousClients}" "${path}")
+	if [[ ${addClientsStatus} == "true" && -n "${previousClients}" ]]; then 	config=$(jq -r ".inbounds[0].settings.clients =${previousClients}" "${path}")
 		echo "${config}" | jq . > "${path}"
 	fi
 }
@@ -2103,9 +2103,9 @@ addClientsHysteria() {
 	local path=$1
 	local addClientsStatus=$2
 
-	if [[ ${addClientsStatus} =="true" && -n "${previousClients}" ]]; then 	local uuids=	uuids=$(echo "${previousClients}" | jq -r [.[].id])
+	if [[ ${addClientsStatus} == "true" && -n "${previousClients}" ]]; then 	local uuids=	uuids=$(echo "${previousClients}" | jq -r [.[].id])
 
-		if [[ "${frontingType}" =="02_trojan_TCP_inbounds" ]]; then 		uuids=$(echo "${previousClients}" | jq -r [.[].password])
+		if [[ "${frontingType}" == "02_trojan_TCP_inbounds" ]]; then 		uuids=$(echo "${previousClients}" | jq -r [.[].password])
 		fi
 		config=$(jq -r ".auth.config =${uuids}" "${path}")
 		echo "${config}" | jq . > "${path}"
@@ -2117,7 +2117,7 @@ initHysteriaPort() {
 	readHysteriaConfig
 	if [[ -n "${hysteriaPort}" ]]; then
 		Read - r - p "Read the port from the previous installation, do you want to use the port from the previous installation? [y/n]:" historyHystereriaPortStatus
-		if [[ "${historyHysteriaPortStatus}" =="y" ]]; then
+		if [[ "${historyHysteriaPortStatus}" == "y" ]]; then
 			EchoContent yellow " n -->Port: ${hysteriaPort}"
 		else
 			hysteriaPort=
@@ -2141,11 +2141,11 @@ initHysteriaPort() {
 #Initialize the protocol for Hysteria
 initHysteriaProtocol() {
 	EchoContent skyBlue " n Please select a protocol type"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	EchoContent yellow "1. udp (QUIC) (default)"
 	echoContent yellow "2.faketcp"
 	echoContent yellow "3.wechat-video"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" selectHysteriaProtocol
 	case ${selectHysteriaProtocol} in
 	1)
@@ -2234,7 +2234,7 @@ initV2RayConfig() {
 
 	Read - r - p "Do you want to customize UUID? [y/n]:" customUUIDStatus
 	echo
-	if [[ "${customUUIDStatus}" =="y" ]]; then
+	if [[ "${customUUIDStatus}" == "y" ]]; then
 		Read - r - p "Please enter a valid UUID:" currentCustomimUUID
 		if [[ -n "${currentCustomUUID}" ]]; then 		uuid=${currentCustomUUID}
 		fi
@@ -2242,7 +2242,7 @@ initV2RayConfig() {
 	local addClientsStatus=
 	if [[ -n "${currentUUID}" && -z "${uuid}" ]]; then
 		Read - r - p "Read the last installation record, do you want to use the UUID from the last installation? [y/n]:" historyUUIDStatus
-		if [[ "${historyUUIDStatus}" =="y" ]]; then 		uuid=${currentUUID}
+		if [[ "${historyUUIDStatus}" == "y" ]]; then 		uuid=${currentUUID}
 			addClientsStatus=true
 		else
 			uuid=$(/etc/v2ray-agent/v2ray/v2ctl uuid)
@@ -2323,7 +2323,7 @@ EOF
 	local fallbacksList='{"dest":31300,"xver":0},{"alpn":"h2","dest":31302,"xver":0}'
 
 	# trojan
-	if echo "${selectCustomInstallType}" | grep -q 4 || [[ "$1" =="all" ]]; then
+	if echo "${selectCustomInstallType}" | grep -q 4 || [[ "$1" == "all" ]]; then
 
 		fallbacksList='{"dest":31296,"xver":1},{"alpn":"h2","dest":31302,"xver":0}'
 
@@ -2362,7 +2362,7 @@ EOF
 	fi
 
 	# VLESS_WS_TLS
-	if echo "${selectCustomInstallType}" | grep -q 1 || [[ "$1" =="all" ]]; then 	fallbacksList=${fallbacksList}',{"path":"/'${customPath}'ws","dest":31297,"xver":1}'
+	if echo "${selectCustomInstallType}" | grep -q 1 || [[ "$1" == "all" ]]; then 	fallbacksList=${fallbacksList}',{"path":"/'${customPath}'ws","dest":31297,"xver":1}'
 		getClients "${configPath}../tmp/03_VLESS_WS_inbounds.json" "${addClientsStatus}"
 		cat <<EOF >/etc/v2ray-agent/v2ray/conf/03_VLESS_WS_inbounds.json
 {
@@ -2397,7 +2397,7 @@ EOF
 	fi
 
 	# trojan_grpc
-	if echo "${selectCustomInstallType}" | grep -q 2 || [[ "$1" =="all" ]]; then
+	if echo "${selectCustomInstallType}" | grep -q 2 || [[ "$1" == "all" ]]; then
 		if ! echo "${selectCustomInstallType}" | grep -q 5 && [[ -n ${selectCustomInstallType} ]]; then 		fallbacksList=${fallbacksList//31302/31304}
 		fi
 		getClients "${configPath}../tmp/04_trojan_gRPC_inbounds.json" "${addClientsStatus}"
@@ -2436,7 +2436,7 @@ EOF
 	fi
 
 	# VMess_WS
-	if echo "${selectCustomInstallType}" | grep -q 3 || [[ "$1" =="all" ]]; then 	fallbacksList=${fallbacksList}',{"path":"/'${customPath}'vws","dest":31299,"xver":1}'
+	if echo "${selectCustomInstallType}" | grep -q 3 || [[ "$1" == "all" ]]; then 	fallbacksList=${fallbacksList}',{"path":"/'${customPath}'vws","dest":31299,"xver":1}'
 
 		getClients "${configPath}../tmp/05_VMess_WS_inbounds.json" "${addClientsStatus}"
 
@@ -2473,7 +2473,7 @@ EOF
 		addClients "/etc/v2ray-agent/v2ray/conf/05_VMess_WS_inbounds.json" "${addClientsStatus}"
 	fi
 
-	if echo "${selectCustomInstallType}" | grep -q 5 || [[ "$1" =="all" ]]; then
+	if echo "${selectCustomInstallType}" | grep -q 5 || [[ "$1" == "all" ]]; then
 		getClients "${configPath}../tmp/06_VLESS_gRPC_inbounds.json" "${addClientsStatus}"
 		cat <<EOF >/etc/v2ray-agent/v2ray/conf/06_VLESS_gRPC_inbounds.json
 {
@@ -2566,7 +2566,7 @@ initXrayFrontingConfig() {
 		menu
 		exit 0
 	fi
-	if [[ "${coreInstallType}" !="1" ]]; then
+	if [[ "${coreInstallType}" != "1" ]]; then
 		EchoContent red "-->No available types installed"
 	fi
 	local xtlsType=
@@ -2578,18 +2578,18 @@ initXrayFrontingConfig() {
 	fi
 
 	EchoContent skyBlue " nFunction 1/${totalProgress}: Front switch to ${xtlsType}"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "# Precautions  n
 	EchoContent yellow "will replace the prefix with ${xtlsType}"
 	EchoContent yellow "If Trojan is in front, when viewing the account, two nodes of the Trojan protocol will appear, one of which is not available with xtls
 	EchoContent yellow "Executing again can switch to the previous preceding  n
 
 	EchoContent yellow "1. Switch to ${xtlsType}"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" selectType
-	if [[ "${selectType}" =="1" ]]; then
+	if [[ "${selectType}" == "1" ]]; then
 
-		if [[ "${xtlsType}" =="Trojan" ]]; then
+		if [[ "${xtlsType}" == "Trojan" ]]; then
 
 			local VLESSConfig
 			VLESSConfig=$(cat ${configPath}${frontingType}.json)
@@ -2601,7 +2601,7 @@ initXrayFrontingConfig() {
 
 			echo "${VLESSConfig}" | jq . >$ {configPath}02_trojan_TCP_inbounds.json
 			rm ${configPath}${frontingType}.json
-		elif [[ "${xtlsType}" =="VLESS" ]]; then
+		elif [[ "${xtlsType}" == "VLESS" ]]; then
 
 			local VLESSConfig
 			VLESSConfig=$(cat ${configPath}02_trojan_TCP_inbounds.json)
@@ -2637,7 +2637,7 @@ initXrayConfig() {
 	local addClientsStatus=
 	if [[ -n "${currentUUID}" ]]; then
 		Read - r - p "Read the last installation record, do you want to use the UUID from the last installation? [y/n]:" historyUUIDStatus
-		if [[ "${historyUUIDStatus}" =="y" ]]; then 		uuid=${currentUUID}
+		if [[ "${historyUUIDStatus}" == "y" ]]; then 		uuid=${currentUUID}
 			EchoContent green " n -->Successfully used"
 			if [[ -z "${uuid}" ]]; then
 				EchoContent red " n -->uuid read error, regenerate"
@@ -2725,7 +2725,7 @@ EOF
 	local fallbacksList='{"dest":31300,"xver":0},{"alpn":"h2","dest":31302,"xver":0}'
 
 	# trojan
-	if echo "${selectCustomInstallType}" | grep -q 4 || [[ "$1" =="all" ]]; then 	fallbacksList='{"dest":31296,"xver":1},{"alpn":"h2","dest":31302,"xver":0}'
+	if echo "${selectCustomInstallType}" | grep -q 4 || [[ "$1" == "all" ]]; then 	fallbacksList='{"dest":31296,"xver":1},{"alpn":"h2","dest":31302,"xver":0}'
 		getClients "${configPath}../tmp/04_trojan_TCP_inbounds.json" "${addClientsStatus}"
 
 		cat <<EOF >/etc/v2ray-agent/xray/conf/04_trojan_TCP_inbounds.json
@@ -2762,7 +2762,7 @@ EOF
 	fi
 
 	# VLESS_WS_TLS
-	if echo "${selectCustomInstallType}" | grep -q 1 || [[ "$1" =="all" ]]; then 	fallbacksList=${fallbacksList}',{"path":"/'${customPath}'ws","dest":31297,"xver":1}'
+	if echo "${selectCustomInstallType}" | grep -q 1 || [[ "$1" == "all" ]]; then 	fallbacksList=${fallbacksList}',{"path":"/'${customPath}'ws","dest":31297,"xver":1}'
 		getClients "${configPath}../tmp/03_VLESS_WS_inbounds.json" "${addClientsStatus}"
 		cat <<EOF >/etc/v2ray-agent/xray/conf/03_VLESS_WS_inbounds.json
 {
@@ -2797,7 +2797,7 @@ EOF
 	fi
 
 	# trojan_grpc
-	if echo "${selectCustomInstallType}" | grep -q 2 || [[ "$1" =="all" ]]; then
+	if echo "${selectCustomInstallType}" | grep -q 2 || [[ "$1" == "all" ]]; then
 		if ! echo "${selectCustomInstallType}" | grep -q 5 && [[ -n ${selectCustomInstallType} ]]; then 		fallbacksList=${fallbacksList//31302/31304}
 		fi
 		getClients "${configPath}../tmp/04_trojan_gRPC_inbounds.json" "${addClientsStatus}"
@@ -2836,7 +2836,7 @@ EOF
 	fi
 
 	# VMess_WS
-	if echo "${selectCustomInstallType}" | grep -q 3 || [[ "$1" =="all" ]]; then 	fallbacksList=${fallbacksList}',{"path":"/'${customPath}'vws","dest":31299,"xver":1}'
+	if echo "${selectCustomInstallType}" | grep -q 3 || [[ "$1" == "all" ]]; then 	fallbacksList=${fallbacksList}',{"path":"/'${customPath}'vws","dest":31299,"xver":1}'
 		getClients "${configPath}../tmp/05_VMess_WS_inbounds.json" "${addClientsStatus}"
 		cat <<EOF >/etc/v2ray-agent/xray/conf/05_VMess_WS_inbounds.json
 {
@@ -2871,7 +2871,7 @@ EOF
 		addClients "/etc/v2ray-agent/xray/conf/05_VMess_WS_inbounds.json" "${addClientsStatus}"
 	fi
 
-	if echo "${selectCustomInstallType}" | grep -q 5 || [[ "$1" =="all" ]]; then
+	if echo "${selectCustomInstallType}" | grep -q 5 || [[ "$1" == "all" ]]; then
 		getClients "${configPath}../tmp/06_VLESS_gRPC_inbounds.json" "${addClientsStatus}"
 		cat <<EOF >/etc/v2ray-agent/xray/conf/06_VLESS_gRPC_inbounds.json
 {
@@ -3043,7 +3043,7 @@ EOF
 #Custom CDN IP
 customCDNIP() {
 	EchoContent skyBlue " n Progress $1/${totalProgress}: Add cloudflare custom CNAME"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "# Precautions"
 	EchoContent yellow " n Tutorial address:
 	echoContent skyBlue " https://github.com/reeceyng/v2ray-agent/blob/master/documents/optimize_V2Ray.md "
@@ -3080,9 +3080,9 @@ defaultBase64Code() {
 	local subAccount
 	subAccount=$(echo "${email}" | awk -F "[_]" '{print $1}')_$ (echo "${id}_currentHost" | md5sum | awk '{print $1}')
 	email="${email:0:3}"
-	if [[ "${type}" =="vlesstcp" ]]; then
+	if [[ "${type}" == "vlesstcp" ]]; then
 
-		if [[ "${coreInstallType}" =="1" ]] && echo "${currentInstallProtocolType}" | grep -q 0; then
+		if [[ "${coreInstallType}" == "1" ]] && echo "${currentInstallProtocolType}" | grep -q 0; then
 			EchoContent yellow "-->Universal format (VLESS+TCP+TLS/xtls rprx direct)
 			echoContent green "    vless://${id}@${currentHost}:${currentDefaultPort}?encryption=none&security=xtls&type=tcp&host=${currentHost}&headerType=none&sni=${currentHost}&flow=xtls-rprx-direct#${email}\n"
 
@@ -3134,7 +3134,7 @@ EOF
 			echoContent green "    https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless%3A%2F%2F ${id}%40${currentHost}%3A${currentDefaultPort}%3Fencryption%3Dnone%26security%3Dtls%26type%3Dtcp%26${currentHost}%3D${currentHost}%26headerType%3Dnone%26sni%3D${currentHost}%26flow%3Dxtls-rprx-vision%23${email/direct/splice}\n"
 		fi
 
-	elif [[ "${type}" =="trojanTCPXTLS" ]]; then
+	elif [[ "${type}" == "trojanTCPXTLS" ]]; then
 		EchoContent yellow "-->Universal format (Trojan+TCP+TLS/xtls rprx direct)
 		echoContent green "    trojan://${id}@${currentHost}:${currentDefaultPort}?encryption=none&security=xtls&type=tcp&host=${currentHost}&headerType=none&sni=${currentHost}&flow=xtls-rprx-direct#${email}\n"
 
@@ -3159,7 +3159,7 @@ EOF
 		EchoContent yellow "-->QR code Trojan (Trojan+TCP+TLS/xtls rprx splice)
 		echoContent green "    https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=trojan%3A%2F%2F ${id}%40${currentHost}%3A${currentDefaultPort}%3Fencryption%3Dnone%26security%3Dxtls%26type%3Dtcp%26${currentHost}%3D${currentHost}%26headerType%3Dnone%26sni%3D${currentHost}%26flow%3Dxtls-rprx-splice%23${email/direct/splice}\n"
 
-	elif [[ "${type}" =="vmessws" ]]; then
+	elif [[ "${type}" == "vmessws" ]]; then
 		qrCodeBase64Default=$(echo -n "{\"port\":${currentDefaultPort},\"ps\":\"${email}-vmess-ws\",\"tls\":\"tls\",\"id\":\"${id}\",\"aid\":0,\"v\":2,\"host\":\"${currentHost}\",\"type\":\"none\",\"path\":\"/${currentPath}vws\",\"net\":\"ws\",\"add\":\"${currentAdd}\",\"allowInsecure\":0,\"method\":\"none\",\"peer\":\"${currentHost}\",\"sni\":\"${currentHost}\"}" | base64 -w 0)
 		qrCodeBase64Default="${qrCodeBase64Default///}"
 
@@ -3174,7 +3174,7 @@ vmess://${qrCodeBase64Default}
 EOF
 		echoContent green "    https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vmess://${qrCodeBase64Default}\n"
 
-		#	elif [[ "${type}" =="vmesstcp" ]]; then
+		#	elif [[ "${type}" == "vmesstcp" ]]; then
 		#
 		#		echoContent red "path:${path}"
 		#		qrCodeBase64Default=$(echo -n "{\"add\":\"${add}\",\"aid\":0,\"host\":\"${host}\",\"id\":\"${id}\",\"net\":\"tcp\",\"path\":\"${path}\",\"port\":${port},\"ps\":\"${email}\",\"scy\":\"none\",\"sni\":\"${host}\",\"tls\":\"tls\",\"v\":2,\"type\":\"http\",\"allowInsecure\":0,\"peer\":\"${host}\",\"obfs\":\"http\",\"obfsParam\":\"${host}\"}" | base64)
@@ -3191,7 +3191,7 @@ EOF
 		#		EchoContent yellow "-->QR code vmess (VMess+TCP+TLS)"
 		#		echoContent green "    https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vmess://${qrCodeBase64Default}\n"
 
-	elif [[ "${type}" =="vlessws" ]]; then
+	elif [[ "${type}" == "vlessws" ]]; then
 
 		EchoContent yellow "-->Universal format (VLESS+WS+TLS)
 		echoContent green "    vless://${id}@${currentAdd}:${currentDefaultPort}?encryption=none&security=tls&type=ws&host=${currentHost}&sni=${currentHost}&path=/${currentPath}ws#${email}-vless-ws\n"
@@ -3206,7 +3206,7 @@ EOF
 		EchoContent yellow "-->QR code VLESS (VLESS+WS+TLS)
 		echoContent green "    https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless%3A%2F%2F ${id}%40${currentAdd}%3A${currentDefaultPort}%3Fencryption%3Dnone%26security%3Dtls%26type%3Dws%26host%3D${currentHost}%26sni%3D${currentHost}%26path%3D%252f${currentPath}ws%23${email}"
 
-	elif [[ "${type}" =="vlessgrpc" ]]; then
+	elif [[ "${type}" == "vlessgrpc" ]]; then
 
 		EchoContent yellow "-->General format (VLESS+gRPC+TLS)
 		echoContent green "    vless://${id}@${currentAdd}:${currentDefaultPort}?encryption=none&security=tls&type=grpc&host=${currentHost}&path=${currentPath}grpc&serviceName=${currentPath}grpc&alpn=h2&sni=${currentHost}#${email}-vless-grpc\n"
@@ -3220,7 +3220,7 @@ EOF
 		EchoContent yellow "-->QR code VLESS (VLESS+gRPC+TLS)
 		echoContent green "    https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless%3A%2F%2F ${id}%40${currentAdd}%3A${currentDefaultPort}%3Fencryption%3Dnone%26security%3Dtls%26type%3Dgrpc%26host%3D${currentHost}%26serviceName%3D${currentPath}grpc%26path%3D${currentPath}grpc%26sni%3D${currentHost}%26alpn%3Dh2%23${email}"
 
-	elif [[ "${type}" =="trojan" ]]; then
+	elif [[ "${type}" == "trojan" ]]; then
 		# URLEncode
 		echoContent yellow " ---> Trojan(TLS)"
 		echoContent green "    trojan://${id}@${currentHost}:${currentDefaultPort}?peer=${currentHost}&sni=${currentHost}&alpn=http/1.1#${currentHost}-trojan\n"
@@ -3231,7 +3231,7 @@ EOF
 		EchoContent yellow "-->QR code Trojan (TLS)"
 		echoContent green "    https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=trojan%3a%2f%2f ${id}%40${currentHost}%3a${port}%3fpeer%3d${currentHost}%26sni%3d${currentHost}%26alpn%3Dhttp/1.1%23${email}\n"
 
-	elif [[ "${type}" =="trojangrpc" ]]; then
+	elif [[ "${type}" == "trojangrpc" ]]; then
 		# URLEncode
 
 		echoContent yellow " ---> Trojan gRPC(TLS)"
@@ -3242,7 +3242,7 @@ EOF
 		EchoContent yellow "-->QR code Trojan gRPC (TLS)"
 		echoContent green "    https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=trojan%3a%2f%2f ${id}%40${currentAdd}%3a${currentDefaultPort}%3Fencryption%3Dnone%26security%3Dtls%26peer%3d${currentHost}%26type%3Dgrpc%26sni%3d${currentHost}%26path%3D${currentPath}trojangrpc%26alpn%3Dh2%26serviceName%3D${currentPath}trojangrpc%23${email}\n"
 
-	elif [[ "${type}" =="hysteria" ]]; then
+	elif [[ "${type}" == "hysteria" ]]; then
 		echoContent yellow " ---> Hysteria(TLS)"
 		echoContent green "    hysteria://${currentHost}:${hysteriaPort}?protocol=${hysteriaProtocol}&auth=${id}&peer=${currentHost}&insecure=0&alpn=h3&upmbps=${hysteriaClientUploadSpeed}&downmbps=${hysteriaClientDownloadSpeed}#${email}\n"
 		cat <<EOF >>"/etc/v2ray-agent/subscribe_tmp/${subAccount}"
@@ -3295,7 +3295,7 @@ showAccounts() {
 				EchoContent skyBlue " n -->Account: ${email}"
 				echo
 				local path="${currentPath}ws"
-				#	if [[ ${coreInstallType} =="1" ]]; then
+				#	if [[ ${coreInstallType} == "1" ]]; then
 				#		EchoContent yellow "Xray will have a 0-RTT path after it, which is not compatible with clients centered on v2ray. Please manually delete it before using it 
 				#		path="${currentPath}ws"
 				#	fi
@@ -3307,7 +3307,7 @@ showAccounts() {
 		if echo ${currentInstallProtocolType} | grep -q 3; then
 			echoContent skyBlue "\n================================VMess WS TLS CDN ================================\n"
 			local path="${currentPath}vws"
-			if [[ ${coreInstallType} =="1" ]]; then 			path="${currentPath}vws"
+			if [[ ${coreInstallType} == "1" ]]; then 			path="${currentPath}vws"
 			fi
 			jq .inbounds[0].settings.clients ${configPath}05_VMess_WS_inbounds.json | jq -c '. []' | while read -r user; do
 				local email=
@@ -3370,10 +3370,10 @@ showAccounts() {
 			local uuidType=
 			uuidType=".id"
 
-			if [[ "${frontingType}" =="02_trojan_TCP_inbounds" ]]; then 			uuidType=".password"
+			if [[ "${frontingType}" == "02_trojan_TCP_inbounds" ]]; then 			uuidType=".password"
 			fi
 
-			defaultUser=$(jq '.inbounds[0].settings.clients[]|select('${uuidType}'=="'"${user}"'")' ${configPath}${frontingType}.json)
+			defaultUser=$(jq '.inbounds[0].settings.clients[]|select('${uuidType}'== "'"${user}"'")' ${configPath}${frontingType}.json)
 			local email=
 			email=$(echo "${defaultUser}" | jq -r .email)
 
@@ -3422,12 +3422,12 @@ checkNginx302() {
 
 #Backup and restore nginx files
 backupNginxConfig() {
-	if [[ "$1" =="backup" ]]; then
+	if [[ "$1" == "backup" ]]; then
 		cp /etc/nginx/conf.d/alone.conf /etc/v2ray-agent/alone_backup.conf
 		EchoContent green "-->Successfully backed up nginx configuration file"
 	fi
 
-	if [[ "$1" =="restoreBackup" ]] && [[ -f "/etc/v2ray-agent/alone_backup.conf" ]]; then
+	if [[ "$1" == "restoreBackup" ]] && [[ -f "/etc/v2ray-agent/alone_backup.conf" ]]; then
 		cp /etc/v2ray-agent/alone_backup.conf /etc/nginx/conf.d/alone.conf
 		EchoContent green "-->Successfully restored and backed up nginx configuration file"
 		rm /etc/v2ray-agent/alone_backup.conf
@@ -3457,7 +3457,7 @@ addNginx302() {
 #Update camouflage station
 updateNginxBlog() {
 	EchoContent skyBlue " n Progress $1/${totalProgress}: Change masquerade site"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	EchoContent yellow "# To customize, please manually copy the template file to/usr/share/nginx/html  n
 	EchoContent yellow "1. Novice guidance"
 	EchoContent yellow "2. Game website"
@@ -3469,19 +3469,19 @@ updateNginxBlog() {
 	EchoContent yellow "8. Personal Blog 02"
 	EchoContent yellow "9.404 Auto jump to Baidu"
 	EchoContent yellow "10.302 Redirect website"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" selectInstallNginxBlogType
 
-	if [[ "${selectInstallNginxBlogType}" =="10" ]]; then
-		echoContent red "\n=============================================================="
+	if [[ "${selectInstallNginxBlogType}" == "10" ]]; then
+		echoContent red "\n============================================================== "
 		EchoContent yellow "Redirection has a higher priority. If the camouflage site is changed after configuring 302, the camouflage site under the root route will not work
 		EchoContent yellow "If you want to disguise the site's implementation function, you need to delete the 302 redirect configuration  n
 		EchoContent yellow "1. Add"
 		EchoContent yellow "2. Delete"
-		echoContent red "=============================================================="
+		echoContent red "============================================================== "
 		Read - r - p "Please select:" redirectStatus
 
-		if [[ "${redirectStatus}" =="1" ]]; then
+		if [[ "${redirectStatus}" == "1" ]]; then
 			backupNginxConfig backup
 			Please enter the domain name to redirect, for example https://www.baidu.com: " redirectDomain
 			removeNginx302
@@ -3496,7 +3496,7 @@ updateNginxBlog() {
 			checkNginx302
 			exit 0
 		fi
-		if [[ "${redirectStatus}" =="2" ]]; then
+		if [[ "${redirectStatus}" == "2" ]]; then
 			removeNginx302
 			EchoContent green "-->Successfully removed 302 redirection"
 			exit 0
@@ -3522,7 +3522,7 @@ updateNginxBlog() {
 #Add New Port
 addCorePort() {
 	EchoContent skyBlue " nFunction 1/${totalProgress}: Add new port"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "# Precautions  n
 	EchoContent yellow "supports batch addition"
 	EchoContent yellow "does not affect the use of the default port"
@@ -3532,9 +3532,9 @@ addCorePort() {
 
 	EchoContent yellow "1. Add Port"
 	EchoContent yellow "2. Delete Port"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" selectNewPortType
-	if [[ "${selectNewPortType}" =="1" ]]; then
+	if [[ "${selectNewPortType}" == "1" ]]; then
 		Read - r - p "Please enter the port number:" newPort
 		Read - r - p "Please enter the default port number, which will also change the subscription port and node port. [Enter] defaults to 443:" defaultPort
 
@@ -3548,7 +3548,7 @@ addCorePort() {
 				rm -rf "$(find ${configPath}* | grep "${port}")"
 
 				local fileName=
-				if [[ -n "${defaultPort}" && "${port}" =="${defaultPort}" ]]; then 				fileName="${configPath}02_dokodemodoor_inbounds_${port}_default.json"
+				if [[ -n "${defaultPort}" && "${port}" == "${defaultPort}" ]]; then 				fileName="${configPath}02_dokodemodoor_inbounds_${port}_default.json"
 				else
 					fileName="${configPath}02_dokodemodoor_inbounds_${port}.json"
 				fi
@@ -3583,7 +3583,7 @@ EOF
 			EchoContent green "-->Successfully added"
 			reloadCore
 		fi
-	elif [[ "${selectNewPortType}" =="2" ]]; then
+	elif [[ "${selectNewPortType}" == "2" ]]; then
 
 		find ${configPath} -name "*dokodemodoor*" | awk -F "[c][o][n][f][/]" '{print ""NR""":"$2}'
 		Read - r - p "Please enter the port number to delete:" portIndex
@@ -3602,7 +3602,7 @@ EOF
 #Uninstall Script
 unInstall() {
 	Read - r - p "Are you sure you want to uninstall the installation content? [y/n]:" uninstallStatus
-	if [[ "${unInstallStatus}" !="y" ]]; then
+	if [[ "${unInstallStatus}" != "y" ]]; then
 		EchoContent green "-->Abort uninstallation"
 		menu
 		exit 0
@@ -3613,12 +3613,12 @@ unInstall() {
 		EchoContent green "-->Stopping Nginx succeeded"
 	fi
 
-	if [[ "${coreInstallType}" =="1" ]]; then
+	if [[ "${coreInstallType}" == "1" ]]; then
 		handleXray stop
 		rm -rf /etc/systemd/system/xray.service
 		EchoContent green "-->Delete Xray startup completion"
 
-	elif [[ "${coreInstallType}" =="2" ]]; then
+	elif [[ "${coreInstallType}" == "2" ]]; then
 
 		handleV2Ray stop
 		rm -rf /etc/systemd/system/v2ray.service
@@ -3669,12 +3669,12 @@ updateV2RayCDN() {
 	EchoContent skyBlue " n Progress $1/${totalProgress}: Modifying CDN nodes"
 
 	if [[ -n "${currentAdd}" ]]; then
-		echoContent red "=============================================================="
+		echoContent red "============================================================== "
 		echoContent yellow "1.CNAME www.digitalocean.com"
 		echoContent yellow "2.CNAME www.cloudflare.com"
 		echoContent yellow "3.CNAME hostmonit.com"
 		EchoContent yellow "4. Manual input"
-		echoContent red "=============================================================="
+		echoContent red "============================================================== "
 		Read - r - p "Please select:" selectCDNType
 		case ${selectCDNType} in
 		1)
@@ -3695,7 +3695,7 @@ updateV2RayCDN() {
 			if [[ -n "${currentAdd}" ]]; then
 				sed -i "s/\"${currentAdd}\"/\"${setDomain}\"/g" "$(grep "${currentAdd}" -rl ${configPath}${frontingType}.json)"
 			fi
-			if [[ $(jq -r .inbounds[0].settings.clients[0].add ${configPath}${frontingType}.json) =="${setDomain}" ]]; then
+			if [[ $(jq -r .inbounds[0].settings.clients[0].add ${configPath}${frontingType}.json) == "${setDomain}" ]]; then
 				EchoContent green "-->CDN modification successful"
 				reloadCore
 			else
@@ -3715,9 +3715,9 @@ manageUser() {
 	EchoContent yellow "2. Delete user"
 	echoContent skyBlue "-----------------------------------------------------"
 	Read - r - p "Please select:" manageUserType
-	if [[ "${manageUserType}" =="1" ]]; then
+	if [[ "${manageUserType}" == "1" ]]; then
 		addUser
-	elif [[ "${manageUserType}" =="2" ]]; then
+	elif [[ "${manageUserType}" == "2" ]]; then
 		removeUser
 	else
 		EchoContent red "-->Selection error"
@@ -3728,7 +3728,7 @@ manageUser() {
 customUUID() {
 	#	Read - r - p "Do you want to customize UUID? [y/n]:" customUUIDStatus
 	#	echo
-	#	if [[ "${customUUIDStatus}" =="y" ]]; then
+	#	if [[ "${customUUIDStatus}" == "y" ]]; then
 	Read - r - p "Please enter a valid UUID, [Enter] Random UUID:" currentCustomimUUID
 	echo
 	if [[ -z "${currentCustomUUID}" ]]; then
@@ -3738,7 +3738,7 @@ customUUID() {
 
 	else
 		jq -r -c '.inbounds[0].settings.clients[].id' ${configPath}${frontingType}.json | while read -r line; do
-			if [[ "${line}" =="${currentCustomUUID}" ]]; then
+			if [[ "${line}" == "${currentCustomUUID}" ]]; then
 				echo >/tmp/v2ray-agent
 			fi
 		done
@@ -3755,7 +3755,7 @@ customUUID() {
 customUserEmail() {
 	#	Read - r - p "Do you want to customize the email? [y/n]:" customEmailStatus
 	#	echo
-	#	if [[ "${customEmailStatus}" =="y" ]]; then
+	#	if [[ "${customEmailStatus}" == "y" ]]; then
 	Read - r - p "Please enter a valid email, [Enter] random email:" currentCustomimEmail
 	echo
 	if [[ -z "${currentCustomEmail}" ]]; then 	currentCustomEmail="${currentHost}_${currentCustomUUID}"
@@ -3763,7 +3763,7 @@ customUserEmail() {
 		#		EchoContent red "-->Email cannot be empty"
 	else
 		jq -r -c '.inbounds[0].settings.clients[].email' ${configPath}${frontingType}.json | while read -r line; do
-			if [[ "${line}" =="${currentCustomEmail}" ]]; then
+			if [[ "${line}" == "${currentCustomEmail}" ]]; then
 				echo >/tmp/v2ray-agent
 			fi
 		done
@@ -3788,7 +3788,7 @@ addUser() {
 	fi
 
 	#Generate Users
-	if [[ "${userNum}" =="1" ]]; then
+	if [[ "${userNum}" == "1" ]]; then
 		customUUID
 		customUserEmail
 	fi
@@ -3809,11 +3809,11 @@ addUser() {
 		#	Compatible with v2ray core
 		users="{\"id\":\"${uuid}\",\"flow\":\"xtls-rprx-direct\",\"email\":\"${email}\",\"alterId\":0}"
 
-		if [[ "${coreInstallType}" =="2" ]]; then
+		if [[ "${coreInstallType}" == "2" ]]; then
 			users="{\"id\":\"${uuid}\",\"email\":\"${email}\",\"alterId\":0}"
 		fi
 
-		if [[ "${coreInstallType}" =="3" ]]; then
+		if [[ "${coreInstallType}" == "3" ]]; then
 			users="{\"id\":\"${uuid}\",\"flow\":\"xtls-rprx-vision\",\"email\":\"${email}\",\"alterId\":0}"
 		fi
 
@@ -3937,13 +3937,13 @@ removeUser() {
 #Update Script
 updateV2RayAgent() {
 	local scriptType=
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "1. Upgrade to the latest stable version"
 	EchoContent yellow "2. Upgrade to the latest development version"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" selectScriptType
-	if [[ "${selectScriptType}" =="1" ]]; then 	scriptType="master"
-	elif [[ "${selectScriptType}" =="2" ]]; then 	scriptType="dev"
+	if [[ "${selectScriptType}" == "1" ]]; then 	scriptType="master"
+	elif [[ "${selectScriptType}" == "2" ]]; then 	scriptType="dev"
 	else
 	updateV2RayAgent
 	fi
@@ -3971,14 +3971,14 @@ updateV2RayAgent() {
 
 #Firewall
 handleFirewall() {
-	if systemctl status ufw 2>/dev/null | grep -q "active (exited)" && [[ "$1" =="stop" ]]; then
+	if systemctl status ufw 2>/dev/null | grep -q "active (exited)" && [[ "$1" == "stop" ]]; then
 		systemctl stop ufw >/dev/null 2>&1
 		systemctl disable ufw >/dev/null 2>&1
 		EchoContent green "-->ufw closed successfully"
 
 	fi
 
-	if systemctl status firewalld 2>/dev/null | grep -q "active (running)" && [[ "$1" =="stop" ]]; then
+	if systemctl status firewalld 2>/dev/null | grep -q "active (running)" && [[ "$1" == "stop" ]]; then
 		systemctl stop firewalld >/dev/null 2>&1
 		systemctl disable firewalld >/dev/null 2>&1
 		EchoContent green "-->Firewalld closed successfully"
@@ -3987,13 +3987,13 @@ handleFirewall() {
 
 #Install BBR
 bbrInstall() {
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent green "A mature work of [ylx2016] for BBR and DD scripts, address:[ https://github.com/ylx2016/Linux-NetSpeed ]Please be familiar with“
 	EchoContent yellow "1. Installation script [recommended original BBR+FQ]
 	EchoContent yellow "2. Fallback to home directory"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" installBBRStatus
-	if [[ "${installBBRStatus}" =="1" ]]; then
+	if [[ "${installBBRStatus}" == "1" ]]; then
 		wget -N --no-check-certificate " https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh " && chmod +x tcp.sh && ./tcp.sh
 	else
 		menu
@@ -4011,10 +4011,10 @@ checkLog() {
 	fi
 
 	EchoContent skyBlue " nFunction $1/${totalProgress}: View logs"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "# It is recommended to open access logs only during debugging  n
 
-	if [[ "${logStatus}" =="false" ]]; then
+	if [[ "${logStatus}" == "false" ]]; then
 		EchoContent yellow "1. Open access log"
 	else
 		EchoContent yellow "1. Close access log"
@@ -4025,14 +4025,14 @@ checkLog() {
 	EchoContent yellow "4. View certificate timed task log"
 	EchoContent yellow "5. View certificate installation log"
 	EchoContent yellow "6. Clear Log"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 
 	Read - r - p "Please select:" selectAccessLogType
 	local configPathLog=${configPath//conf\//}
 
 	case ${selectAccessLogType} in
 	1)
-		if [[ "${logStatus}" =="false" ]]; then
+		if [[ "${logStatus}" == "false" ]]; then
 			cat <<EOF >${configPath}00_log.json
 {
   "log": {
@@ -4042,7 +4042,7 @@ checkLog() {
   }
 }
 EOF
-		elif [[ "${logStatus}" =="true" ]]; then
+		elif [[ "${logStatus}" == "true" ]]; then
 			cat <<EOF >${configPath}00_log.json
 {
   "log": {
@@ -4096,7 +4096,7 @@ aliasInstall() {
 			fi
 			rm -rf "$HOME/install.sh"
 		fi
-		if [[ "${vasmaType}" =="true" ]]; then
+		if [[ "${vasmaType}" == "true" ]]; then
 			EchoContent green "Shortcut created successfully, can execute [vasma] to reopen the script"
 		fi
 	fi
@@ -4123,13 +4123,13 @@ ipv6Routing() {
 
 	checkIPv6
 	EchoContent skyBlue " nFunction 1/${totalProgress}: IPv6 redirection"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "1. Add domain name"
 	EchoContent yellow "2. Uninstalling IPv6 redirection"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" ipv6Status
-	if [[ "${ipv6Status}" =="1" ]]; then
-		echoContent red "=============================================================="
+	if [[ "${ipv6Status}" == "1" ]]; then
+		echoContent red "============================================================== "
 		EchoContent yellow "# Precautions  n
 		EchoContent yellow "1. The rule only supports predefined domain name lists[ https://github.com/v2fly/domain-list-community ]"
 		EchoContent yellow "2. Detailed documentation[ https://www.v2fly.org/config/routing.html ]"
@@ -4175,7 +4175,7 @@ EOF
 
 		EchoContent green "-->Successfully added"
 
-	elif [[ "${ipv6Status}" =="2" ]]; then
+	elif [[ "${ipv6Status}" == "2" ]]; then
 
 		unInstallRouting IPv6-out outboundTag
 
@@ -4199,7 +4199,7 @@ btTools() {
 	fi
 
 	EchoContent skyBlue " nFunction 1/${totalProgress}: bt Download Management"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 
 	if [[ -f ${configPath}09_routing.json ]] && grep -q bittorrent <${configPath}09_routing.json; then
 		EchoContent yellow "Current state: Disabled"
@@ -4209,9 +4209,9 @@ btTools() {
 
 	EchoContent yellow "1. Disabled"
 	EchoContent yellow "2. Open"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" btStatus
-	if [[ "${btStatus}" =="1" ]]; then
+	if [[ "${btStatus}" == "1" ]]; then
 
 		if [[ -f "${configPath}09_routing.json" ]]; then
 
@@ -4248,7 +4248,7 @@ EOF
 
 		EchoContent green "-->BT download disabled successfully"
 
-	elif [[ "${btStatus}" =="2" ]]; then
+	elif [[ "${btStatus}" == "2" ]]; then
 
 		unInstallSniffing
 
@@ -4274,13 +4274,13 @@ blacklist() {
 	fi
 
 	EchoContent skyBlue " n Progress $1/${totalProgress}: Domain blacklist"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "1. Add domain name"
 	EchoContent yellow "2. Remove blacklist"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" blacklistStatus
-	if [[ "${blacklistStatus}" =="1" ]]; then
-		echoContent red "=============================================================="
+	if [[ "${blacklistStatus}" == "1" ]]; then
+		echoContent red "============================================================== "
 		EchoContent yellow "# Precautions  n
 		EchoContent yellow "1. The rule only supports predefined domain name lists[ https://github.com/v2fly/domain-list-community ]"
 		EchoContent yellow "2. Detailed documentation[ https://www.v2fly.org/config/routing.html ]"
@@ -4318,7 +4318,7 @@ EOF
 
 		EchoContent green "-->Successfully added"
 
-	elif [[ "${blacklistStatus}" =="2" ]]; then
+	elif [[ "${blacklistStatus}" == "2" ]]; then
 
 		unInstallRouting blackhole-out outboundTag
 
@@ -4343,12 +4343,12 @@ unInstallRouting() {
 			jq -c .routing.rules[] ${configPath}09_routing.json | while read -r line; do
 				local index=$((index + 1))
 				local delStatus=0
-				if [[ "${type}" =="outboundTag" ]] && echo "${line}" | jq .outboundTag | grep -q "${tag}"; then 				delStatus=1
-				elif [[ "${type}" =="inboundTag" ]] && echo "${line}" | jq .inboundTag | grep -q "${tag}"; then 				delStatus=1
+				if [[ "${type}" == "outboundTag" ]] && echo "${line}" | jq .outboundTag | grep -q "${tag}"; then 				delStatus=1
+				elif [[ "${type}" == "inboundTag" ]] && echo "${line}" | jq .inboundTag | grep -q "${tag}"; then 				delStatus=1
 				fi
 
 				if [[ -n ${protocol} ]] && echo "${line}" | jq .protocol | grep -q "${protocol}"; then 				delStatus=1
-				elif [[ -z ${protocol} ]] && [[ $(echo "${line}" | jq .protocol) !="null" ]]; then
+				elif [[ -z ${protocol} ]] && [[ $(echo "${line}" | jq .protocol) != "null" ]]; then
 					delStatus=0
 				fi
 
@@ -4395,7 +4395,7 @@ installSniffing() {
 #Warp diversion
 warpRouting() {
 	EchoContent skyBlue " n Progress $1/${totalProgress}: WARP diversion"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	#	EchoContent yellow "# Precautions  n
 	#	EchoContent yellow "1. After several rounds of testing, there are bugs in the official Warp. Restarting it will cause Warp to fail and fail to start, and there is also a possibility of CPU usage skyrocketing
 	#	EchoContent yellow "2. Without restarting the machine, it can be used normally. If you must use the official warp, it is recommended not to restart the machine
@@ -4405,7 +4405,7 @@ warpRouting() {
 	if [[ -z $(which warp-cli) ]]; then
 		echo
 		Read - r - p "WARP not installed, do you want to install it? [y/n]:" installCloudflareWarpStatus
-		if [[ "${installCloudflareWarpStatus}" =="y" ]]; then
+		if [[ "${installCloudflareWarpStatus}" == "y" ]]; then
 			installWarp
 		else
 			EchoContent yellow "-->Abort installation"
@@ -4413,13 +4413,13 @@ warpRouting() {
 		fi
 	fi
 
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "1. Add domain name"
 	EchoContent yellow "2. Uninstall WARP diversion"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" warpStatus
-	if [[ "${warpStatus}" =="1" ]]; then
-		echoContent red "=============================================================="
+	if [[ "${warpStatus}" == "1" ]]; then
+		echoContent red "============================================================== "
 		EchoContent yellow "# Precautions  n
 		EchoContent yellow "1. The rule only supports predefined domain name lists[ https://github.com/v2fly/domain-list-community ]"
 		EchoContent yellow "2. Detailed documentation[ https://www.v2fly.org/config/routing.html ]"
@@ -4464,7 +4464,7 @@ EOF
 
 		EchoContent green "-->Successfully added"
 
-	elif [[ "${warpStatus}" =="2" ]]; then
+	elif [[ "${warpStatus}" == "2" ]]; then
 
 		${removeType} cloudflare-warp >/dev/null 2>&1
 
@@ -4482,7 +4482,7 @@ EOF
 #Streaming Toolbox
 streamingToolbox() {
 	EchoContent skyBlue " nFunction 1/${totalProgress}: Streaming Toolbox"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	#	EchoContent yellow "1. Netflix detection"
 	EchoContent yellow "1. Any door landing machine unlocks streaming media"
 	EchoContent yellow "2. DNS unlocking streaming"
@@ -4506,7 +4506,7 @@ streamingToolbox() {
 #Unlocking streaming media through any door
 dokodemoDoorUnblockStreamingMedia() {
 	EchoContent skyBlue " nFunction 1/${totalProgress}: Unlock streaming media on any door landing machine"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "# Precautions"
 	EchoContent yellow "For detailed explanation of unlocking any door, please refer to this article[ https://github.com/reeceyng/v2ray-agent/blob/master/documents/netflix/dokodemo-unblock_netflix.md ]\n"
 
@@ -4531,7 +4531,7 @@ dokodemoDoorUnblockStreamingMedia() {
 #VMess+WS+TLS Go to War to Unlock Streaming Media [Outbound Only]
 unblockVMessWSTLSStreamingMedia() {
 	EchoContent skyBlue " nFunction 1/${totalProgress}: VMess+WS+TLS Outbound Unlock Streaming"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "# Precautions"
 	EchoContent yellow "Suitable for unlocking VMess services provided by other service providers  n
 
@@ -4552,7 +4552,7 @@ unblockVMessWSTLSStreamingMedia() {
 #Set VMess+WS+TLS to unlock Netflix [outbound only]
 setVMessWSTLSUnblockStreamingMediaOutbounds() {
 	Read - r - p "Please enter the address to unlock streaming media VMess+WS+TLS:" setVMessWSTLSAddress
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	EchoContent yellow "# Precautions  n
 	EchoContent yellow "1. The rule only supports predefined domain name lists[ https://github.com/v2fly/domain-list-community ]"
 	EchoContent yellow "2. Detailed documentation[ https://www.v2fly.org/config/routing.html ]"
@@ -4631,7 +4631,7 @@ EOF
 #Set any door to unlock Netflix [outbound]
 setDokodemoDoorUnblockStreamingMediaOutbounds() {
 	Read - r - p "Please enter the IP for unlocking streaming vps:" setIP
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	EchoContent yellow "# Precautions  n
 	EchoContent yellow "1. The rule only supports predefined domain name lists[ https://github.com/v2fly/domain-list-community ]"
 	EchoContent yellow "2. Detailed documentation[ https://www.v2fly.org/config/routing.html ]"
@@ -4704,7 +4704,7 @@ EOF
 setDokodemoDoorUnblockStreamingMediaInbounds() {
 
 	EchoContent skyBlue " nFunction 1/${totalProgress}: Add inbound to any door"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "# Precautions  n
 	EchoContent yellow "1. The rule only supports predefined domain name lists[ https://github.com/v2fly/domain-list-community ]"
 	EchoContent yellow "2. Detailed documentation[ https://www.v2fly.org/config/routing.html ]"
@@ -4868,10 +4868,10 @@ removeVMessWSTLSUnblockStreamingMedia() {
 
 #Restart Core
 reloadCore() {
-	if [[ "${coreInstallType}" =="1" || "${coreInstallType}" =="3" ]]; then
+	if [[ "${coreInstallType}" == "1" || "${coreInstallType}" == "3" ]]; then
 		handleXray stop
 		handleXray start
-	elif [[ "${coreInstallType}" =="2" ]]; then
+	elif [[ "${coreInstallType}" == "2" ]]; then
 		handleV2Ray stop
 		handleV2Ray start
 	fi
@@ -4890,7 +4890,7 @@ dnsUnlockNetflix() {
 		exit 0
 	fi
 	EchoContent skyBlue " nFunction 1/${totalProgress}: DNS Unlock Streaming"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "1. Add"
 	EchoContent yellow "2. Uninstall"
 	Read - r - p "Please select:" selectType
@@ -4909,7 +4909,7 @@ dnsUnlockNetflix() {
 setUnlockDNS() {
 	Read - r - p "Please enter the unlock streaming DNS:" setDNS
 	if [[ -n ${setDNS} ]]; then
-		echoContent red "=============================================================="
+		echoContent red "============================================================== "
 		EchoContent yellow "# Precautions  n
 		EchoContent yellow "1. The rule only supports predefined domain name lists[ https://github.com/v2fly/domain-list-community ]"
 		EchoContent yellow "2. Detailed documentation[ https://www.v2fly.org/config/routing.html ]"
@@ -4920,7 +4920,7 @@ setUnlockDNS() {
 		EchoContent yellow "7. Please enter 1 for the default scheme, which includes the following content"
 		echoContent yellow "netflix,bahamut,hulu,hbo,disney,bbc,4chan,fox,abema,dmm,niconico,pixiv,bilibili,viu"
 		Read - r - p "Please enter the domain name according to the above example:" domainList
-		if [[ "${domainList}" =="1" ]]; then
+		if [[ "${domainList}" == "1" ]]; then
 			cat <<EOF >${configPath}11_dns.json
             {
             	"dns": {
@@ -5104,15 +5104,15 @@ customXrayInstall() {
 #Choose core installation - v2ray core, xray core
 selectCoreInstall() {
 	EchoContent skyBlue " nFunction 1/${totalProgress}: Select Core Installation"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	echoContent yellow "1.Xray-core"
 	echoContent yellow "2.v2ray-core"
 EchoContent yellow "3. Xray core (using xtls rprx vision)
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" selectCoreType
 	case ${selectCoreType} in
 	1)
-		if [[ "${selectInstallType}" =="2" ]]; then
+		if [[ "${selectInstallType}" == "2" ]]; then
 			customXrayInstall
 		else
 			xrayCoreInstall
@@ -5120,7 +5120,7 @@ EchoContent yellow "3. Xray core (using xtls rprx vision)
 		;;
 	2)
 		v2rayCoreVersion=
-		if [[ "${selectInstallType}" =="2" ]]; then
+		if [[ "${selectInstallType}" == "2" ]]; then
 			customV2RayInstall
 		else
 			v2rayCoreInstall
@@ -5128,7 +5128,7 @@ EchoContent yellow "3. Xray core (using xtls rprx vision)
 		;;
 	3)
 		xtlsRprxVision=true
-		if [[ "${selectInstallType}" =="2" ]]; then
+		if [[ "${selectInstallType}" == "2" ]]; then
 			customXrayInstall
 		else
 			xrayCoreInstall
@@ -5247,16 +5247,16 @@ coreVersionManageMenu() {
 		menu
 		exit 0
 	fi
-	if [[ "${coreInstallType}" =="1" || "${coreInstallType}" =="3" ]]; then
+	if [[ "${coreInstallType}" == "1" || "${coreInstallType}" == "3" ]]; then
 		xrayVersionManageMenu 1
-	elif [[ "${coreInstallType}" =="2" ]]; then
+	elif [[ "${coreInstallType}" == "2" ]]; then
 		v2rayCoreVersion=
 		v2rayVersionManageMenu 1
 	fi
 }
 #Scheduled Task Check Certificate
 cronRenewTLS() {
-	if [[ "${renewTLS}" =="RenewTLS" ]]; then
+	if [[ "${renewTLS}" == "RenewTLS" ]]; then
 		renewalTLS
 		exit 0
 	fi
@@ -5264,22 +5264,22 @@ cronRenewTLS() {
 #Account management
 manageAccount() {
 	EchoContent skyBlue " nFunction 1/${totalProgress}: Account Management"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent yellow "# After deleting or adding an account, you need to review the subscription again to generate a subscription"
 	EchoContent yellow "# If Hysteria is installed, the account will also be added to Hysteria  n
 	EchoContent yellow "1. View account"
 	EchoContent yellow "2. View subscription"
 	EchoContent yellow "3. Add User"
 	EchoContent yellow "4. Delete user"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please enter:" manageAccountStatus
-	if [[ "${manageAccountStatus}" =="1" ]]; then
+	if [[ "${manageAccountStatus}" == "1" ]]; then
 		showAccounts 1
-	elif [[ "${manageAccountStatus}" =="2" ]]; then
+	elif [[ "${manageAccountStatus}" == "2" ]]; then
 		subscribe 1
-	elif [[ "${manageAccountStatus}" =="3" ]]; then
+	elif [[ "${manageAccountStatus}" == "3" ]]; then
 		addUser
-	elif [[ "${manageAccountStatus}" =="4" ]]; then
+	elif [[ "${manageAccountStatus}" == "4" ]]; then
 		removeUser
 	else
 		EchoContent red "-->Selection error"
@@ -5308,7 +5308,7 @@ subscribe() {
 				echoContent yellow "email:${email}\n"
 				local currentDomain=${currentHost}
 
-				if [[ -n "${currentDefaultPort}" && "${currentDefaultPort}" !="443" ]]; then 				currentDomain="${currentHost}:${currentDefaultPort}"
+				if [[ -n "${currentDefaultPort}" && "${currentDefaultPort}" != "443" ]]; then 				currentDomain="${currentHost}:${currentDefaultPort}"
 				fi
 
 				echoContent yellow "url:https://${currentDomain}/s/${email}\n"
@@ -5330,36 +5330,36 @@ switchAlpn() {
 		exit 0
 	fi
 
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent green "The current Alpn starts with: ${currentAlpn}"
 	EchoContent yellow "1. When HTTP/1.1 comes first, trojan is available, and some clients of gRPC are available [clients support manual selection of alpn available]
 	EchoContent yellow "2. When h2 comes first, gRPC is available, while some trojan clients are available [clients support manual selection of alpn available]
 	EchoContent yellow "3. If the client does not support manual replacement of the Alpn, it is recommended to use this function to change the server's Alpn order and use the corresponding protocol"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 
-	if [[ "${currentAlpn}" =="http/1.1" ]]; then
+	if [[ "${currentAlpn}" == "http/1.1" ]]; then
 		EchoContent yellow "1. Switch to the first position of Alpn h2"
-	elif [[ "${currentAlpn}" =="h2" ]]; then
+	elif [[ "${currentAlpn}" == "h2" ]]; then
 		EchoContent yellow "1. Switch to the first position of Alpn HTTP/1.1"
 	else
 		EchoContent red 'does not match'
 	fi
 
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 
 	Read - r - p "Please select:" selectSwitchAlpnType
-	if [[ "${selectSwitchAlpnType}" =="1" && "${currentAlpn}" =="http/1.1" ]]; then
+	if [[ "${selectSwitchAlpnType}" == "1" && "${currentAlpn}" == "http/1.1" ]]; then
 
 		local frontingTypeJSON
-		if [[ "${coreInstallType}" =="1" ]]; then
+		if [[ "${coreInstallType}" == "1" ]]; then
 			frontingTypeJSON=$(jq -r ".inbounds[0].streamSettings.xtlsSettings.alpn =[\"h2\",\"http/1.1\"]" ${configPath}${frontingType}.json)
 		else
 		    frontingTypeJSON=$(jq -r ".inbounds[0].streamSettings.tlsSettings.alpn =[\"h2\",\"http/1.1\"]" ${configPath}${frontingType}.json)
 		fi
 		echo "${frontingTypeJSON}" | jq . >$ {configPath}${frontingType}.json
 
-	elif [[ "${selectSwitchAlpnType}" =="1" && "${currentAlpn}" =="h2" ]]; then 	local frontingTypeJSON
-		if [[ "${coreInstallType}" =="1" ]]; then
+	elif [[ "${selectSwitchAlpnType}" == "1" && "${currentAlpn}" == "h2" ]]; then 	local frontingTypeJSON
+		if [[ "${coreInstallType}" == "1" ]]; then
 			frontingTypeJSON=$(jq -r ".inbounds[0].streamSettings.xtlsSettings.alpn =[\"http/1.1\",\"h2\"]" ${configPath}${frontingType}.json)
 		else
 		    frontingTypeJSON=$(jq -r ".inbounds[0].streamSettings.tlsSettings.alpn =[\"http/1.1\",\"h2\"]" ${configPath}${frontingType}.json)
@@ -5376,7 +5376,7 @@ switchAlpn() {
 manageHysteria() {
 
 	EchoContent skyBlue " n Progress 1/1: Hysteria Management"
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	local hysteriaStatus=
 	if [[ -n "${hysteriaConfigPath}" ]]; then
 		EchoContent yellow "1. Reinstall"
@@ -5388,29 +5388,29 @@ manageHysteria() {
 		EchoContent yellow "1. Installation"
 	fi
 
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	Read - r - p "Please select:" installHysteriaStatus
-	if [[ "${installHysteriaStatus}" =="1" ]]; then
+	if [[ "${installHysteriaStatus}" == "1" ]]; then
 		hysteriaCoreInstall
-	elif [[ "${installHysteriaStatus}" =="2" && "${hysteriaStatus}" =="true" ]]; then
+	elif [[ "${installHysteriaStatus}" == "2" && "${hysteriaStatus}" == "true" ]]; then
 		unInstallHysteriaCore
-	elif [[ "${installHysteriaStatus}" =="3" && "${hysteriaStatus}" =="true" ]]; then
+	elif [[ "${installHysteriaStatus}" == "3" && "${hysteriaStatus}" == "true" ]]; then
 		installHysteria 1
 		handleHysteria start
-	elif [[ "${installHysteriaStatus}" =="4" && "${hysteriaStatus}" =="true" ]]; then 	journalctl -fu hysteria
+	elif [[ "${installHysteriaStatus}" == "4" && "${hysteriaStatus}" == "true" ]]; then 	journalctl -fu hysteria
 	fi
 }
 #Main Menu
 menu() {
 	cd "$HOME" || exit
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	EchoContent green "Author: Reece"
 	EchoContent green "Original author: mack a"
 	EchoContent green "Current version: v2.7.3"
 	echoContent green "Github: https://github.com/reeceyng/v2ray-agent "
 	EchoContent green "Description: Eight in one co storage script  c"
 	showInstallStatus
-	echoContent red "\n=============================================================="
+	echoContent red "\n============================================================== "
 	if [[ -n "${coreInstallType}" ]]; then
 		EchoContent yellow "1. Reinstall"
 	else
@@ -5444,7 +5444,7 @@ menu() {
 	EchoContent skyBlue "-------- Script Management --------
 	EchoContent yellow "19. View Log"
 	EchoContent yellow "20. Uninstall Script"
-	echoContent red "=============================================================="
+	echoContent red "============================================================== "
 	mkdirTools
 	aliasInstall
 	Read - r - p "Please select:" selectInstallType
